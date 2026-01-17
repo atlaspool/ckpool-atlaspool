@@ -40,11 +40,7 @@ CKPool is an ultra low overhead, massively scalable, multi-process, multi-thread
 
 ```bash
 # Ubuntu/Debian
-sudo apt-get install build-essential yasm libzmq3-dev
-
-# Build from source
-./configure
-make
+sudo apt-get install build-essential yasm libzmq3-dev autoconf automake libtool
 ```
 
 ### Configuration
@@ -124,7 +120,8 @@ $ curl http://localhost:8080/
 git clone https://github.com/atlaspool/ckpool-atlaspool.git
 cd ckpool-atlaspool
 
-# Configure and build
+# Generate configure script and build
+./autogen.sh
 ./configure
 make
 
