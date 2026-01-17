@@ -1,0 +1,92 @@
+# Build artifacts
+*.o
+*.lo
+*.a
+*.la
+.libs/
+.deps/
+
+# Compiled binaries
+src/ckpool
+src/ckpmsg
+src/notifier
+src/ckproxy
+test/sha256
+
+# Autotools generated files
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache/
+compile
+config.guess
+config.h
+config.h.in
+config.h.in~
+config.log
+config.status
+config.sub
+configure~
+depcomp
+install-sh
+libtool
+ltmain.sh
+missing
+stamp-h1
+test-driver
+m4/libtool.m4
+m4/ltoptions.m4
+m4/ltsugar.m4
+m4/ltversion.m4
+m4/lt~obsolete.m4
+
+# Backup files
+*.backup
+*.BACK
+*~
+*.20[0-9][0-9][0-9][0-9][0-9][0-9]
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Configuration files (may contain sensitive data)
+# Uncomment if you don't want to commit configs
+# ckpool.conf
+# ckproxy.conf
+# ckpassthrough.conf
+# cknode.conf
+# ckredirector.conf
+
+# Log files
+logs/
+*.log
+
+# Jansson build artifacts
+src/jansson-2.14/Makefile
+src/jansson-2.14/Makefile.in
+src/jansson-2.14/config.log
+src/jansson-2.14/config.status
+src/jansson-2.14/configure~
+src/jansson-2.14/jansson_private_config.h
+src/jansson-2.14/jansson_private_config.h.in~
+src/jansson-2.14/libtool
+src/jansson-2.14/stamp-h1
+src/jansson-2.14/autom4te.cache/
+src/jansson-2.14/doc/Makefile
+src/jansson-2.14/src/Makefile
+src/jansson-2.14/src/.deps/
+src/jansson-2.14/src/.libs/
+src/jansson-2.14/src/*.o
+src/jansson-2.14/src/*.lo
+src/jansson-2.14/src/*.la
+src/jansson-2.14/jansson.pc
+
+# Patch files
+*.patch
