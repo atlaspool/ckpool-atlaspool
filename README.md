@@ -36,11 +36,25 @@ CKPool is an ultra low overhead, massively scalable, multi-process, multi-thread
 
 ## Quick Start
 
-### Prerequisites
+### Building from Source
 
 ```bash
-# Ubuntu/Debian
+# Install dependencies (Ubuntu/Debian)
 sudo apt-get install build-essential yasm libzmq3-dev autoconf automake libtool
+
+# Clone the repository
+git clone https://github.com/atlaspool/ckpool-atlaspool.git
+cd ckpool-atlaspool
+
+# Generate configure script and build
+./autogen.sh
+./configure
+make
+
+# Binaries will be in src/ directory:
+# - ckpool (main pool server)
+# - ckpmsg (messaging utility)
+# - notifier (block notification handler)
 ```
 
 ### Configuration
@@ -112,24 +126,6 @@ $ curl http://localhost:8080/
 - **[ATLASPOOL_MODIFICATIONS.md](ATLASPOOL_MODIFICATIONS.md)** - Complete technical documentation of all modifications
 - **[README](README)** - Original CKPool documentation
 - **[README-SOLOMINING](README-SOLOMINING)** - Solo mining setup guide
-
-## Building from Source
-
-```bash
-# Clone the repository
-git clone https://github.com/atlaspool/ckpool-atlaspool.git
-cd ckpool-atlaspool
-
-# Generate configure script and build
-./autogen.sh
-./configure
-make
-
-# Binaries will be in src/ directory:
-# - ckpool (main pool server)
-# - ckpmsg (messaging utility)
-# - notifier (block notification handler)
-```
 
 ## Differences from Original CKPool
 
