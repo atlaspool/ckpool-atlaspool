@@ -889,7 +889,19 @@ int mining_ipc_submit_solution(mining_block_template *t, uint32_t version,
 			req.setCoinbase(kj::arrayPtr(reinterpret_cast<const capnp::byte *>(coinbase),
 						     coinbase_len));
 			return req.send().then([](auto resp) -> bool {
-				return resp.getResult();
+				bool result = resp.getResult();
+				/* Core v32 submitSolution (@10) returns reason/debug text
+				 * explaining a rejection. Surface it to stderr (captured by
+				 * journald) so a rejected block is diagnosable instead of
+				 * opaque. */
+				if (!result) {
+					kj::StringPtr reason = resp.hasReason() ? resp.getReason() : "";
+					kj::StringPtr dbg = resp.hasDebug() ? resp.getDebug() : "";
+					fprintf(stderr, "mining_ipc: submitSolution rejected: reason=\"%s\" debug=\"%s\"\n",
+						reason.cStr(), dbg.cStr());
+					fflush(stderr);
+				}
+				return result;
 			});
 		});
 		*accepted = ok ? 1 : 0;
