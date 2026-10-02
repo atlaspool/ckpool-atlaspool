@@ -32,7 +32,7 @@ branch.
 
 ---
 
-## Modifications on this branch (4)
+## Modifications on this branch (5)
 
 | # | Modification | Files |
 |---|---|---|
@@ -40,9 +40,43 @@ branch.
 | 2 | BTC Signature Customization (drop hardcoded `ckpool` coinbase prefix) | `src/stratifier.c` |
 | 3 | User Agent Tracking (incl. Jan 2026 update-on-every-connection fix) | `src/stratifier.c` |
 | 4 | Default Donation Address | `src/ckpool.c` |
+| 5 | IPC mining stubs regenerated for Core v32 (`submitSolution @10`) | `ipc/mining/mining.capnp` (+ regenerated `*.capnp.c++`/`.h`), `ipc/mining/mining_ipc.cpp` |
 
-All AtlasPool edits are marked with an `ATLASPOOL:` comment so they are greppable
-(`git grep ATLASPOOL`).
+Items 1-4 are marked with an `ATLASPOOL:` comment (`git grep ATLASPOOL`). Item 5 is an
+IPC-compatibility fix (schema regen), described below.
+
+### 5. IPC mining stubs regenerated for Core v32 (`submitSolution @10`)
+
+**Problem (caught on testnet4):** ckpool's bundled Cap'n Proto mining schema targeted the
+old `BlockTemplate.submitSolution @7 -> (result: Bool)`. Bitcoin Core **v32** deprecated that
+method (renamed it `submitSolutionOld7`) and replaced it with
+`submitSolution @10 -> (reason: Text, debug: Text, result: Bool)`. Against a v32 node every
+block submission therefore failed at the IPC layer with
+`Old submitSolution (@7) not supported. Please update your client!` — so a found block was
+**never submitted to the network**. This is NOT one of the AtlasPool feature mods; it is a
+compatibility fix required to run ckpool's IPC mining against Core v32.
+
+**Fix:**
+- `ipc/mining/mining.capnp`: adopt v32's `BlockTemplate.submitSolution @10` (returning
+  reason/debug/result) and keep the deprecated `submitSolutionOld7 @7`; also add v32's
+  `Mining.submitBlock @7`, `getTransactionsByTxID @8`, `getTransactionsByWitnessID @9`. The
+  schema file id (`@0xc77d03df6a41b505`) and all other types are unchanged — this is exactly
+  Core v32's `src/ipc/capnp/mining.capnp` body under ckpool's local-copy header.
+- Regenerated `mining.capnp.{c++,h}` and `common.capnp.{c++,h}` with Cap'n Proto 1.1.0:
+  ```
+  cd ipc/mining
+  capnpc -o c++ -I /usr/local/include -I . mining.capnp common.capnp
+  ```
+  (The `-I` paths are required: `/usr/local/include` resolves `import "/capnp/c++.capnp"`,
+  `.` resolves `import "/mp/proxy.capnp"` — the client-only proxy shim vendored in `mp/`.)
+- `ipc/mining/mining_ipc.cpp`: `mining_ipc_submit_solution` now also reads the node's
+  `reason`/`debug` from the `@10` response and logs them to stderr (captured by journald) on
+  a rejection, so a rejected submission is diagnosable. The pure-C API in `mining_ipc.h` and
+  the caller in `stratifier.c` are unchanged (no ABI change).
+
+**Note:** upstream ckpool (including current master) still ships `submitSolution @7`, so this
+branch is **ahead of upstream** for Core v32 support. Regenerate again if a future Core bumps
+the Mining interface; the authoritative schema is always `<core>/src/ipc/capnp/mining.capnp`.
 
 > **Note on line numbers:** this branch's base is ~11 months newer than old `main`, so
 > every change was re-located against current `e9b66549` source rather than applied by
