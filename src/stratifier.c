@@ -651,8 +651,16 @@ static void generate_coinbase(workbase_t *wb)
 	len += wb->enonce2varlen;
 
 	wb->coinb2bin = ckzalloc(512);
-	memcpy(wb->coinb2bin, "\x0a\x63\x6b\x70\x6f\x6f\x6c", 7);
-	wb->coinb2len = 7;
+	/* ATLASPOOL: do NOT prepend the hardcoded "ckpool" tag to the coinbase
+	 * signature. Upstream starts coinb2 with "\x0a\x63\x6b\x70\x6f\x6f\x6c"
+	 * (a push of "ckpool"), making the on-chain sig "ckpool"+btcsig. Start
+	 * empty so the coinbase signature is EXACTLY the configured btcsig (e.g.
+	 * "/AtlasPool/IAD/") with no "ckpool" prefix. The script length byte at
+	 * coinb1bin[41] is derived from the final len below, so dropping these 7
+	 * bytes self-corrects the length. If btcsig is unset the coinbase simply
+	 * carries no vanity tag (BIP34 height + extranonce remain), which is a
+	 * valid coinbase. */
+	wb->coinb2len = 0;
 	if (ckpool.btcsig) {
 		int siglen = strlen(ckpool.btcsig);
 
