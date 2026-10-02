@@ -2272,7 +2272,8 @@ int main(int argc, char **argv)
 			ckpool.btcdpass[i] = strdup("pass");
 	}
 
-	ckpool.donaddress = "bc1q28kkr5hk4gnqe3evma6runjrd2pvqyp8fpwfzu";
+	/* ATLASPOOL: default solo-mining donation address (APIO CKPool 2026-10) */
+	ckpool.donaddress = "bc1q4mtk3hsnlfhh8475krdnf4hec86ue43eckywft";
 
 	/* Donations on testnet are meaningless but required for complete
 	 * testing. Testnet and regtest addresses */
