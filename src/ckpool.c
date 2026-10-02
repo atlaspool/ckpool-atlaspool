@@ -1776,6 +1776,8 @@ static void parse_config(void)
 	yyjson_obj_get_int64(&ckpool.mindiff, json_conf, "mindiff");
 	yyjson_obj_get_int64(&ckpool.startdiff, json_conf, "startdiff");
 	yyjson_obj_get_int64(&ckpool.highdiff, json_conf, "highdiff");
+	/* ATLASPOOL: minimum (floor) difficulty for high-diff ports */
+	yyjson_obj_get_int64(&ckpool.highdiffmin, json_conf, "highdiffmin");
 	yyjson_obj_get_int64(&ckpool.maxdiff, json_conf, "maxdiff");
 	yyjson_obj_get_string(&ckpool.logdir, json_conf, "logdir");
 	yyjson_obj_get_int(&ckpool.maxclients, json_conf, "maxclients");
@@ -2011,6 +2013,7 @@ static void report_config(void)
 	printf("mindiff = %"PRId64"\n", ckpool.mindiff);
 	printf("startdiff = %"PRId64"\n", ckpool.startdiff);
 	printf("highdiff = %"PRId64"\n", ckpool.highdiff);
+	printf("highdiffmin = %"PRId64"\n", ckpool.highdiffmin); /* ATLASPOOL */
 	printf("maxdiff = %"PRId64"\n", ckpool.maxdiff);
 	printf("nonce1length = %d\n", ckpool.nonce1length);
 	printf("nonce2length = %d\n", ckpool.nonce2length);
@@ -2306,6 +2309,9 @@ int main(int argc, char **argv)
 		ckpool.startdiff = 10000;
 	if (!ckpool.highdiff)
 		ckpool.highdiff = 1000000;
+	/* ATLASPOOL: default the high-diff floor (matches main branch) */
+	if (!ckpool.highdiffmin)
+		ckpool.highdiffmin = 1000000;
 	if (!ckpool.logdir)
 		ckpool.logdir = strdup("logs");
 #ifdef HAVE_SV2

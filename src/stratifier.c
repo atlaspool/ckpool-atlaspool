@@ -6585,6 +6585,15 @@ static void add_submit(stratum_instance_t *client, const double diff, const bool
 	/* Set to higher of optimal and user chosen diff */
 	optimal = MAX(optimal, mindiff);
 
+	/* ATLASPOOL: enforce minimum difficulty for high diff ports so vardiff
+	 * cannot lower a high-diff client below highdiffmin, defeating the
+	 * purpose of a dedicated high-hashrate port. Placed before the maxdiff
+	 * and network_diff MIN clamps below (matches the main branch), so it can
+	 * never raise optimal above network difficulty. */
+	if (ckpool.server_highdiff && ckpool.server_highdiff[client->server]) {
+		optimal = MAX(optimal, ckpool.highdiffmin);
+	}
+
 	/* Set to lower of optimal and pool maxdiff */
 	if (ckpool.maxdiff)
 		optimal = MIN(optimal, ckpool.maxdiff);

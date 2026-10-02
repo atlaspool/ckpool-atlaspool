@@ -261,6 +261,7 @@ struct ckpool_instance {
 	int64_t mindiff; // Default 1
 	int64_t startdiff; // Default 10000
 	int64_t highdiff; // Default 1000000
+	int64_t highdiffmin; // ATLASPOOL: Minimum difficulty for high diff ports (default 1000000)
 	int64_t maxdiff; // No default
 
 	/* Coinbase data */
