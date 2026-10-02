@@ -213,6 +213,11 @@ struct worker_instance {
 	int64_t best_ever; /* Best share ever found by this worker */
 	int mindiff; /* User chosen mindiff */
 
+	/* ATLASPOOL: miner software (user-agent) of the most recent connection
+	 * for this worker, for analytics/support. Updated on every connection
+	 * (not just the first) so it tracks firmware upgrades. */
+	char *useragent;
+
 	bool idle;
 	bool notified_idle;
 };
@@ -6230,6 +6235,13 @@ static user_instance_t *generate_user(stratum_instance_t *client,
 	ck_wlock(&sdata->instance_lock);
 	client->user_instance = user;
 	client->worker_instance = worker;
+	/* ATLASPOOL: record this connection's user-agent on the worker. Update
+	 * on every connection (Jan 2026 fix) so a firmware upgrade is reflected
+	 * rather than sticking at the first-seen value. */
+	if (client->useragent && strlen(client->useragent) > 0) {
+		free(worker->useragent);
+		worker->useragent = strdup(client->useragent);
+	}
 	DL_APPEND2(user->clients, client, user_prev, user_next);
 	__inc_worker(sdata,user, worker);
 	ck_wunlock(&sdata->instance_lock);
@@ -10034,8 +10046,11 @@ static void *statsupdate(void __maybe_unused *arg)
 
 				LOGDEBUG("Storing worker %s", worker->workername);
 
-				wval = yyjson_mut_pack_val(doc, "{ss,ss,ss,ss,ss,ss,sI,sI,sf,sI}",
+				/* ATLASPOOL: include the worker's user-agent (miner
+				 * software) in worker stats for analytics/support. */
+				wval = yyjson_mut_pack_val(doc, "{ss,ss,ss,ss,ss,ss,ss,sI,sI,sf,sI}",
 					"workername", worker->workername,
+					"useragent", worker->useragent ? worker->useragent : "",
 					"hashrate1m", suffix1,
 					"hashrate5m", suffix5,
 					"hashrate1hr", suffix60,
