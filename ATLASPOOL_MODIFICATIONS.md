@@ -10,6 +10,23 @@ Cap'n Proto IPC mining shim (`ipc/mining/`).
 
 ---
 
+## Production validation — four testnet4 blocks mined with this exact build
+
+This build was validated end-to-end against a live **Bitcoin Core v32** node over the
+Cap'n Proto IPC mining interface: it successfully found, submitted, and got **four blocks
+accepted and confirmed on testnet4**. This is the direct proof that modification #5 (the
+`submitSolution @10` IPC stub regen) works — before that fix, every solved block was
+rejected at the IPC layer and never reached the network.
+
+| Block height | Hash |
+|---|---|
+| 154810 | [`0000000000000000bfe518f5716bfff334520f24680de626668bf76b06481b08`](https://mempool.space/testnet4/block/0000000000000000bfe518f5716bfff334520f24680de626668bf76b06481b08) |
+| 154820 | [`00000000000000008fb3711edb4f8455f53cead9b6436e611f0a20a5dcab7c9b`](https://mempool.space/testnet4/block/00000000000000008fb3711edb4f8455f53cead9b6436e611f0a20a5dcab7c9b) |
+| 154842 | [`0000000000000000722564cadd2bbb32f4270ba5a69f5321fa78a466f7484d31`](https://mempool.space/testnet4/block/0000000000000000722564cadd2bbb32f4270ba5a69f5321fa78a466f7484d31) |
+| 154864 | [`00000000000000014790fbda94997cd109182deaf8da73657ef276de364713a4`](https://mempool.space/testnet4/block/00000000000000014790fbda94997cd109182deaf8da73657ef276de364713a4) |
+
+---
+
 ## Purpose
 
 This branch is a **fresh start** from the latest upstream ckpool, into which a
@@ -230,6 +247,16 @@ PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig \
 make -j$(nproc)
 ```
 `configure` should report `IPC (mining Cap'n)...: yes`.
+
+> **Built and validated on ARM (aarch64).** This build — and the four testnet4 blocks
+> above — were produced on an **ARM64 system** (AWS Graviton), which is why the `CFLAGS`
+> above use `-march=armv8.2-a+crypto`. **Build instructions may differ on Intel/x86-64
+> systems:** that `-march` value is ARM-specific and will not compile on x86. Use an
+> appropriate x86 target instead (e.g. `-march=native` on the build host, or
+> `-march=x86-64-v2`/`-msse4.2` for a portable baseline). The rest of the build (autogen,
+> configure flags, Cap'n Proto 1.1.0 requirement, dependencies) is architecture-independent;
+> only the `-march` differs. The build has not been exercised on x86, so expect to adjust
+> `-march` and verify the capnp toolchain paths on that platform.
 
 ---
 
